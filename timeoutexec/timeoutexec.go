@@ -7,12 +7,12 @@ import (
 )
 
 type FuncExecutor struct {
-	f       func(...interface{}) error
+	f       func(ctx context.Context, args ...interface{}) error
 	timeout time.Duration
 	args    []interface{}
 }
 
-func NewFuncExecutor(f func(...interface{}) error) *FuncExecutor {
+func NewFuncExecutor(f func(ctx context.Context, args ...interface{}) error) *FuncExecutor {
 	return &FuncExecutor{
 		f:       f,
 		timeout: 10 * time.Second,
@@ -40,7 +40,7 @@ func (e *FuncExecutor) Execute(ctx context.Context) error {
 				done <- fmt.Errorf("panic occurred: %v", r)
 			}
 		}()
-		err := e.f(e.args...)
+		err := e.f(ctx, e.args...)
 		done <- err
 	}()
 
